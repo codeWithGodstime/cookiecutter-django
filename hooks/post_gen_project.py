@@ -37,7 +37,7 @@ def remove_gplv3_files():
 
 
 def remove_custom_user_manager_files():
-    users_path = Path("{{cookiecutter.project_slug}}", "users")
+    users_path = Path("{{cookiecutter.project_slug}}", "apps", "users")
     (users_path / "managers.py").unlink()
     (users_path / "tests" / "test_managers.py").unlink()
 
@@ -220,8 +220,8 @@ def remove_repo_from_pre_commit_config(repo_to_remove: str):
 def remove_celery_files():
     file_paths = [
         Path("config", "celery_app.py"),
-        Path("{{ cookiecutter.project_slug }}", "users", "tasks.py"),
-        Path("{{ cookiecutter.project_slug }}", "users", "tests", "test_tasks.py"),
+        Path("{{ cookiecutter.project_slug }}", "apps", "users", "tasks.py"),
+        Path("{{ cookiecutter.project_slug }}", "apps", "users", "tests", "test_tasks.py"),
     ]
     for file_path in file_paths:
         file_path.unlink()
@@ -250,6 +250,15 @@ def remove_dotgithub_folder():
 
 def remove_dotdrone_file():
     Path(".drone.yml").unlink()
+
+
+def remove_channel_files():
+    file_paths = [
+        Path("config", "routing.py"),
+        Path("{{ cookiecutter.project_slug }}", "apps", "users", "consumers.py"),
+    ]
+    for file_path in file_paths:
+        file_path.unlink()
 
 
 def generate_random_string(length, using_digits=False, using_ascii_letters=False, using_punctuation=False):  # noqa: FBT002
@@ -408,8 +417,8 @@ def remove_aws_dockerfile():
 
 def remove_drf_starter_files():
     Path("config", "api_router.py").unlink()
-    shutil.rmtree(Path("{{cookiecutter.project_slug}}", "users", "api"))
-    shutil.rmtree(Path("{{cookiecutter.project_slug}}", "users", "tests", "api"))
+    shutil.rmtree(Path("{{cookiecutter.project_slug}}", "apps", "users", "api"))
+    shutil.rmtree(Path("{{cookiecutter.project_slug}}", "apps", "users", "tests", "api"))
 
 
 def main():  # noqa: C901, PLR0912, PLR0915
@@ -504,6 +513,9 @@ def main():  # noqa: C901, PLR0912, PLR0915
 
     if "{{ cookiecutter.use_async }}".lower() == "n":
         remove_async_files()
+
+    if "{{ cookiecutter.use_channels }}".lower() == "n":
+        remove_channel_files()
 
     setup_dependencies()
 

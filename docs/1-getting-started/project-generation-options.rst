@@ -116,9 +116,6 @@ use_celery:
 use_mailpit:
     Indicates whether the project should be configured to use Mailpit_.
 
-use_sentry:
-    Indicates whether the project should be configured to use Sentry_.
-
 use_whitenoise:
     Indicates whether the project should be configured to use WhiteNoise_.
 

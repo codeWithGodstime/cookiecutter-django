@@ -21,7 +21,7 @@ def main():
     # This allows easy placement of apps within the interior
     # {{ cookiecutter.project_slug }} directory.
     current_path = Path(__file__).parent.resolve()
-    sys.path.append(str(current_path / "{{ cookiecutter.project_slug }}"))
+    sys.path.append(str(current_path / "{{ cookiecutter.project_slug }}" / "apps"))
 
     execute_from_command_line(sys.argv)
 

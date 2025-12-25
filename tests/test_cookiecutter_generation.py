@@ -118,8 +118,6 @@ SUPPORTED_COMBINATIONS = [
     {"use_celery": "n"},
     {"use_mailpit": "y"},
     {"use_mailpit": "n"},
-    {"use_sentry": "y"},
-    {"use_sentry": "n"},
     {"use_whitenoise": "y"},
     {"use_whitenoise": "n"},
     {"use_heroku": "y"},

@@ -29,22 +29,28 @@ uvicorn-worker==0.4.0  # https://github.com/Kludex/uvicorn-worker
 
 # Django
 # ------------------------------------------------------------------------------
-django==5.2.7  # pyup: < 6.0 # https://www.djangoproject.com/
-django-environ==0.12.0  # https://github.com/joke2k/django-environ
-django-model-utils==5.0.0  # https://github.com/jazzband/django-model-utils
-django-allauth[mfa]==65.12.1  # https://github.com/pennersr/django-allauth
-django-crispy-forms==2.4  # https://github.com/django-crispy-forms/django-crispy-forms
-crispy-bootstrap5==2025.6  # https://github.com/django-crispy-forms/crispy-bootstrap5
+django>=6.0.0  # pyup: < 6.0 # https://www.djangoproject.com/
+django-environ # https://github.com/joke2k/django-environ
+{%- if cookiecutter.use_channels == 'y' %}
+daphne
+channels
+channels-redis
+{%- endif %}
+{%- if cookiecutter.monitoring == 'Prometheus' %}
+django-Prometheus
+{%- endif %}
+
 {%- if cookiecutter.frontend_pipeline == 'Django Compressor' %}
 django-compressor==4.5.1  # https://github.com/django-compressor/django-compressor
 {%- endif %}
 django-redis==6.0.0  # https://github.com/jazzband/django-redis
 {%- if cookiecutter.use_drf == 'y' %}
 # Django REST Framework
-djangorestframework==3.16.1  # https://github.com/encode/django-rest-framework
-django-cors-headers==4.9.0  # https://github.com/adamchainz/django-cors-headers
+djangorestframework  # https://github.com/encode/django-rest-framework
+djangorestframework_simplejwt
+django-cors-headers  # https://github.com/adamchainz/django-cors-headers
 # DRF-spectacular for api documentation
-drf-spectacular==0.28.0  # https://github.com/tfranzel/drf-spectacular
+drf-spectacular # https://github.com/tfranzel/drf-spectacular
 {%- endif %}
 {%- if cookiecutter.frontend_pipeline == 'Webpack' %}
 django-webpack-loader==3.2.1  # https://github.com/django-webpack/django-webpack-loader
