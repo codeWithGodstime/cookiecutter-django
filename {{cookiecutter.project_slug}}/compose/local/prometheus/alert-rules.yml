@@ -1,0 +1,30 @@
+groups:
+  - name: django_alerts
+    interval: 30s
+    rules:
+      - alert: DjangoHighErrorRate
+        expr: rate(django_http_requests_total_by_status_and_method{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }}"
+
+      - alert: DjangoHighResponseTime
+        expr: histogram_quantile(0.95, rate(django_http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s"
+
+      - alert: DjangoLowUptimePercentage
+        expr: rate(django_http_requests_total[5m]) == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Django application down"
+          description: "No requests received for 2 minutes"

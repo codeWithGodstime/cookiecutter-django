@@ -32,12 +32,12 @@ uvicorn-worker==0.4.0  # https://github.com/Kludex/uvicorn-worker
 django>=6.0.0  # pyup: < 6.0 # https://www.djangoproject.com/
 django-environ # https://github.com/joke2k/django-environ
 {%- if cookiecutter.use_channels == 'y' %}
-daphne
-channels
-channels-redis
+daphne  # https://github.com/django/daphne
+channels  # https://github.com/django/channels
+channels-redis  # https://github.com/django/channels_redis
 {%- endif %}
-{%- if cookiecutter.monitoring == 'Prometheus' %}
-django-Prometheus
+{%- if cookiecutter.monitoring == 'Prometheus' or cookiecutter.monitoring == 'Grafana' %}
+django-prometheus  # https://github.com/korfuri/django-prometheus
 {%- endif %}
 
 {%- if cookiecutter.frontend_pipeline == 'Django Compressor' %}
@@ -47,7 +47,7 @@ django-redis==6.0.0  # https://github.com/jazzband/django-redis
 {%- if cookiecutter.use_drf == 'y' %}
 # Django REST Framework
 djangorestframework  # https://github.com/encode/django-rest-framework
-djangorestframework_simplejwt
+djangorestframework-simplejwt  # https://github.com/jpadilla/django-rest-framework-simplejwt
 django-cors-headers  # https://github.com/adamchainz/django-cors-headers
 # DRF-spectacular for api documentation
 drf-spectacular # https://github.com/tfranzel/drf-spectacular

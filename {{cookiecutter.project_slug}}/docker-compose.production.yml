@@ -116,3 +116,33 @@ services:
     volumes:
       - production_django_media:/usr/share/nginx/media:ro
   {%- endif %}
+  {%- if cookiecutter.monitoring == 'Prometheus' or cookiecutter.monitoring == 'Grafana' %}
+
+  prometheus:
+    build:
+      context: .
+      dockerfile: ./compose/production/prometheus/Dockerfile
+    image: {{ cookiecutter.project_slug }}_production_prometheus
+    depends_on:
+      - django
+    volumes:
+      - ./compose/production/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./compose/production/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml:ro
+
+  {%- endif %}
+  {%- if cookiecutter.monitoring == 'Grafana' %}
+
+  grafana:
+    build:
+      context: .
+      dockerfile: ./compose/production/grafana/Dockerfile
+    image: {{ cookiecutter.project_slug }}_production_grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - ./compose/production/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+
+  {%- endif %}

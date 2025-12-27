@@ -1,0 +1,48 @@
+groups:
+  - name: django_alerts
+    interval: 30s
+    rules:
+      - alert: DjangoHighErrorRate
+        expr: rate(django_http_requests_total_by_status_and_method{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected in production"
+          description: "Error rate is {{ $value | humanizePercentage }}"
+
+      - alert: DjangoHighResponseTime
+        expr: histogram_quantile(0.95, rate(django_http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected in production"
+          description: "95th percentile response time is {{ $value }}s"
+
+      - alert: DjangoApplicationDown
+        expr: rate(django_http_requests_total[5m]) == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Django application down in production"
+          description: "No requests received for 2 minutes"
+
+      - alert: DjangoHighMemoryUsage
+        expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | humanizePercentage }}"
+
+      - alert: DjangoHighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value | humanizePercentage }}"

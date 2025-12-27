@@ -115,3 +115,39 @@ services:
       {%- endif %}
 
   {%- endif %}
+  {%- if cookiecutter.monitoring == 'Prometheus' or cookiecutter.monitoring == 'Grafana' %}
+
+  prometheus:
+    build:
+      context: .
+      dockerfile: ./compose/local/prometheus/Dockerfile
+    image: {{ cookiecutter.project_slug }}_local_prometheus
+    container_name: {{ cookiecutter.project_slug }}_local_prometheus
+    ports:
+      - '9090:9090'
+    depends_on:
+      - django
+    volumes:
+      - ./compose/local/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./compose/local/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml:ro
+
+  {%- endif %}
+  {%- if cookiecutter.monitoring == 'Grafana' %}
+
+  grafana:
+    build:
+      context: .
+      dockerfile: ./compose/local/grafana/Dockerfile
+    image: {{ cookiecutter.project_slug }}_local_grafana
+    container_name: {{ cookiecutter.project_slug }}_local_grafana
+    ports:
+      - '3000:3000'
+    depends_on:
+      - prometheus
+    volumes:
+      - ./compose/local/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_USER: admin
+
+  {%- endif %}

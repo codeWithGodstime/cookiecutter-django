@@ -421,6 +421,49 @@ def remove_drf_starter_files():
     shutil.rmtree(Path("{{cookiecutter.project_slug}}", "apps", "users", "tests", "api"))
 
 
+def remove_allauth_files():
+    """Remove all django-allauth related files and configuration."""
+    users_path = Path("{{cookiecutter.project_slug}}", "apps", "users")
+    
+    # Remove allauth-specific files
+    files_to_remove = [
+        users_path / "adapters.py",
+        users_path / "forms.py",
+        users_path / "context_processors.py",
+    ]
+    
+    # Remove allauth test files if they exist
+    tests_path = users_path / "tests"
+    test_files_to_remove = [
+        tests_path / "test_forms.py",
+        tests_path / "test_adapters.py",
+    ]
+    
+    for file_path in files_to_remove + test_files_to_remove:
+        if file_path.exists():
+            file_path.unlink()
+
+
+def remove_prometheus_grafana_files():
+    """Remove Prometheus and Grafana configuration if not needed."""
+    compose_local = Path("compose", "local")
+    compose_prod = Path("compose", "production")
+    
+    prometheus_dirs = [
+        compose_local / "prometheus",
+        compose_prod / "prometheus",
+    ]
+    
+    grafana_dirs = [
+        compose_local / "grafana",
+        compose_prod / "grafana",
+    ]
+    
+    for dir_path in prometheus_dirs + grafana_dirs:
+        if dir_path.exists():
+            shutil.rmtree(dir_path)
+
+
 def main():  # noqa: C901, PLR0912, PLR0915
     debug = "{{ cookiecutter.debug }}".lower() == "y"
 
@@ -511,11 +554,17 @@ def main():  # noqa: C901, PLR0912, PLR0915
     if "{{ cookiecutter.use_drf }}".lower() == "n":
         remove_drf_starter_files()
 
+    # Always remove allauth files since we're using JWT
+    remove_allauth_files()
+
     if "{{ cookiecutter.use_async }}".lower() == "n":
         remove_async_files()
 
     if "{{ cookiecutter.use_channels }}".lower() == "n":
         remove_channel_files()
+
+    if "{{ cookiecutter.monitoring }}".lower() == "none":
+        remove_prometheus_grafana_files()
 
     setup_dependencies()
 
