@@ -59,12 +59,10 @@ THIRD_PARTY_APPS = [
 {%- if cookiecutter.use_celery == 'y' %}
     "django_celery_beat",
 {%- endif %}
-{%- if cookiecutter.use_drf == "y" %}
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
     "drf_spectacular",
-{%- endif %}
 {%- if cookiecutter.frontend_pipeline == 'Webpack' %}
     "webpack_loader",
 {%- endif %}
@@ -225,6 +223,7 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
 {%- endif %}
 
+{%- if cookiecutter.use_drf == "y" %}
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",

@@ -26,7 +26,7 @@ production-ready Django projects quickly.
 - [12-Factor](https://12factor.net) based settings via [django-environ](https://github.com/joke2k/django-environ)
 - Secure by default. We believe in SSL.
 - Optimized development and production settings
-- Registration via [django-allauth](https://github.com/pennersr/django-allauth)
+- JWT authentication with [djangorestframework-simplejwt](https://github.com/jpadilla/django-rest-framework-simplejwt)
 - Comes with custom user model ready to go
 - Optional basic ASGI setup for Websockets
 - Optional custom static build using Gulp or Webpack
@@ -46,7 +46,6 @@ _These features can be enabled during initial project setup._
 - Serve static files from Amazon S3, Google Cloud Storage, Azure Storage or [Whitenoise](https://whitenoise.readthedocs.io/)
 - Configuration for [Celery](https://docs.celeryq.dev) and [Flower](https://github.com/mher/flower) (the latter in Docker setup only)
 - Integration with [Mailpit](https://github.com/axllent/mailpit/) for local email testing
-- Integration with [Sentry](https://sentry.io/welcome/) for error logging
 
 ## Constraints
 
@@ -151,18 +150,9 @@ Answer the prompts with your own desired [options](http://cookiecutter-django.re
     9 - Other SMTP
     Choose from 1, 2, 3, 4, 5, 6, 7, 8, 9 [1]: 1
     use_async [n]: n
-    use_drf [n]: y
-    Select frontend_pipeline:
-    1 - None
-    2 - Django Compressor
-    3 - Gulp
-    4 - Webpack
-    Choose from 1, 2, 3, 4 [1]: 1
     use_celery [n]: y
     use_mailpit [n]: n
-    use_sentry [n]: y
     use_whitenoise [n]: n
-    use_heroku [n]: y
     Select ci_tool:
     1 - None
     2 - Travis

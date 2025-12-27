@@ -9,7 +9,7 @@ groups:
           severity: warning
         annotations:
           summary: "High error rate detected"
-          description: "Error rate is {{ $value | humanizePercentage }}"
+          description: {% raw %}"Error rate is {{ $value | humanizePercentage }}"{% endraw %}
 
       - alert: DjangoHighResponseTime
         expr: histogram_quantile(0.95, rate(django_http_request_duration_seconds_bucket[5m])) > 1
@@ -18,7 +18,7 @@ groups:
           severity: warning
         annotations:
           summary: "High response time detected"
-          description: "95th percentile response time is {{ $value }}s"
+          description: {% raw %}"95th percentile response time is {{ $value }}s"{% endraw %}
 
       - alert: DjangoLowUptimePercentage
         expr: rate(django_http_requests_total[5m]) == 0

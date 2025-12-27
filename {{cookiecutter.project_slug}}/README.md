@@ -117,28 +117,11 @@ Now you have your own mail server running locally, ready to receive whatever you
 ## Deployment
 
 The following details how to deploy this application.
-{%- if cookiecutter.use_heroku.lower() == "y" %}
 
-### Heroku
-
-See detailed [cookiecutter-django Heroku documentation](https://cookiecutter-django.readthedocs.io/en/latest/3-deployment/deployment-on-heroku.html).
-
-{%- endif %}
 {%- if cookiecutter.use_docker.lower() == "y" %}
 
 ### Docker
 
 See detailed [cookiecutter-django Docker documentation](https://cookiecutter-django.readthedocs.io/en/latest/3-deployment/deployment-with-docker.html).
 
-{%- endif %}
-{%- if cookiecutter.frontend_pipeline in ['Gulp', 'Webpack'] %}
-
-### Custom Bootstrap Compilation
-
-The generated CSS is set up with automatic Bootstrap recompilation with variables of your choice.
-Bootstrap v5 is installed using npm and customised by tweaking your variables in `static/sass/custom_bootstrap_vars`.
-
-You can find a list of available variables [in the bootstrap source](https://github.com/twbs/bootstrap/blob/v5.1.3/scss/_variables.scss), or get explanations on them in the [Bootstrap docs](https://getbootstrap.com/docs/5.1/customize/sass/).
-
-Bootstrap's javascript as well as its dependencies are concatenated into a single file: `static/js/vendors.js`.
 {%- endif %}

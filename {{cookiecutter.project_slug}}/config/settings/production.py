@@ -4,9 +4,7 @@ from .base import *  # noqa: F403
 from .base import DATABASES
 from .base import INSTALLED_APPS
 from .base import REDIS_URL
-{%- if cookiecutter.use_drf == "y" %}
 from .base import SPECTACULAR_SETTINGS
-{%- endif %}
 from .base import env
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
@@ -226,26 +224,7 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 ANYMAIL = {}
 {%- endif %}
 
-{% if cookiecutter.frontend_pipeline == 'Django Compressor' -%}
-COMPRESS_ENABLED = env.bool("COMPRESS_ENABLED", default=True)
-{%- if cookiecutter.cloud_provider == 'None' %}
-COMPRESS_STORAGE = "compressor.storage.GzipCompressorFileStorage"
-{%- elif cookiecutter.cloud_provider in ('AWS', 'GCP', 'Azure') and cookiecutter.use_whitenoise == 'n' %}
-COMPRESS_STORAGE = STORAGES["staticfiles"]["BACKEND"]
-{%- endif %}
-COMPRESS_URL = STATIC_URL{% if cookiecutter.use_whitenoise == 'y' or cookiecutter.cloud_provider == 'None' %}  # noqa: F405
-{%- endif -%}
-{%- if cookiecutter.use_whitenoise == 'y' %}
-COMPRESS_OFFLINE = True
-{%- endif %}
-COMPRESS_FILTERS = {
-    "css": [
-        "compressor.filters.css_default.CssAbsoluteFilter",
-        "compressor.filters.cssmin.rCSSMinFilter",
-    ],
-    "js": ["compressor.filters.jsmin.JSMinFilter"],
-}
-{% endif %}
+
 {%- if cookiecutter.use_whitenoise == 'n' and cookiecutter.cloud_provider in ('AWS', 'GCP', 'Azure') -%}
 INSTALLED_APPS = ["collectfasta", *INSTALLED_APPS]
 {% endif %}
@@ -272,7 +251,6 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "sentry_sdk": {"level": "ERROR", "handlers": ["console"], "propagate": False},
         "django.security.DisallowedHost": {
             "level": "ERROR",
             "handlers": ["console"],
@@ -281,8 +259,6 @@ LOGGING = {
     },
 }
 
-{% if cookiecutter.use_drf == "y" -%}
 SPECTACULAR_SETTINGS["SERVERS"] = [
     {"url": "https://{{ cookiecutter.domain_name }}", "description": "Production server"},
 ]
-{%- endif %}

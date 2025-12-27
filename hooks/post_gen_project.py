@@ -495,14 +495,10 @@ def main():  # noqa: C901, PLR0912, PLR0915
     if "{{ cookiecutter.use_docker }}".lower() == "y" and "{{ cookiecutter.cloud_provider}}" != "AWS":
         remove_aws_dockerfile()
 
-    if "{{ cookiecutter.use_heroku }}".lower() == "n":
-        remove_heroku_files()
-
-    if "{{ cookiecutter.use_docker }}".lower() == "n" and "{{ cookiecutter.use_heroku }}".lower() == "n":
+    if "{{ cookiecutter.use_docker }}".lower() == "n":
         if "{{ cookiecutter.keep_local_envs_in_vcs }}".lower() == "y":
             print(
-                INFO + ".env(s) are only utilized when Docker Compose and/or "
-                "Heroku support is enabled so keeping them does not make sense "
+                INFO + ".env(s) are only utilized when Docker Compose is enabled so keeping them does not make sense "
                 "given your current setup." + TERMINATOR,
             )
         remove_envs_and_associated_files()
@@ -511,22 +507,6 @@ def main():  # noqa: C901, PLR0912, PLR0915
         append_to_gitignore_file(".envs/*")
         if "{{ cookiecutter.keep_local_envs_in_vcs }}".lower() == "y":
             append_to_gitignore_file("!.envs/.local/")
-
-    if "{{ cookiecutter.frontend_pipeline }}" in ["None", "Django Compressor"]:
-        remove_gulp_files()
-        remove_webpack_files()
-        remove_sass_files()
-        remove_packagejson_file()
-        remove_prettier_pre_commit()
-        if "{{ cookiecutter.use_docker }}".lower() == "y":
-            remove_node_dockerfile()
-    else:
-        remove_project_css()
-        handle_js_runner(
-            "{{ cookiecutter.frontend_pipeline }}",
-            use_docker=("{{ cookiecutter.use_docker }}".lower() == "y"),
-            use_async=("{{ cookiecutter.use_async }}".lower() == "y"),
-        )
 
     if "{{ cookiecutter.cloud_provider }}" == "None" and "{{ cookiecutter.use_docker }}".lower() == "n":
         print(
@@ -550,9 +530,6 @@ def main():  # noqa: C901, PLR0912, PLR0915
 
     if "{{ cookiecutter.ci_tool }}" != "Drone":
         remove_dotdrone_file()
-
-    if "{{ cookiecutter.use_drf }}".lower() == "n":
-        remove_drf_starter_files()
 
     # Always remove allauth files since we're using JWT
     remove_allauth_files()

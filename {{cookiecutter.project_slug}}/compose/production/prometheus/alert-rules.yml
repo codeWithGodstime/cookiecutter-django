@@ -9,7 +9,7 @@ groups:
           severity: critical
         annotations:
           summary: "High error rate detected in production"
-          description: "Error rate is {{ $value | humanizePercentage }}"
+          description: {% raw %}"Error rate is {{ $value | humanizePercentage }}"{% endraw %}
 
       - alert: DjangoHighResponseTime
         expr: histogram_quantile(0.95, rate(django_http_request_duration_seconds_bucket[5m])) > 1
@@ -18,7 +18,7 @@ groups:
           severity: warning
         annotations:
           summary: "High response time detected in production"
-          description: "95th percentile response time is {{ $value }}s"
+          description: {% raw %}"95th percentile response time is {{ $value }}s"{% endraw %}
 
       - alert: DjangoApplicationDown
         expr: rate(django_http_requests_total[5m]) == 0
@@ -36,7 +36,7 @@ groups:
           severity: warning
         annotations:
           summary: "High memory usage detected"
-          description: "Memory usage is {{ $value | humanizePercentage }}"
+          description: {% raw %}"Memory usage is {{ $value | humanizePercentage }}"{% endraw %}
 
       - alert: DjangoHighCPUUsage
         expr: rate(container_cpu_usage_seconds_total[5m]) > 0.8
@@ -45,4 +45,4 @@ groups:
           severity: warning
         annotations:
           summary: "High CPU usage detected"
-          description: "CPU usage is {{ $value | humanizePercentage }}"
+          description: {% raw %}"CPU usage is {{ $value | humanizePercentage }}"{% endraw %}
