@@ -63,9 +63,6 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "drf_spectacular",
-{%- if cookiecutter.frontend_pipeline == 'Webpack' %}
-    "webpack_loader",
-{%- endif %}
 {%- if cookiecutter.use_channels == "y" %}
     "daphne",
     "channels",
@@ -111,9 +108,7 @@ MIDDLEWARE = [
     "django_prometheus.middleware.PrometheusMiddleware",
 {%- endif %}
     "django.middleware.security.SecurityMiddleware",
-{%- if cookiecutter.use_drf == 'y' %}
     "corsheaders.middleware.CorsMiddleware",
-{%- endif %}
 {%- if cookiecutter.use_whitenoise == 'y' %}
     "whitenoise.middleware.WhiteNoiseMiddleware",
 {%- endif %}
@@ -140,30 +135,8 @@ STATICFILES_FINDERS = [
 MEDIA_ROOT = str(APPS_DIR / "media")
 MEDIA_URL = "/media/"
 
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [str(APPS_DIR / "templates")],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.template.context_processors.i18n",
-                "django.template.context_processors.media",
-                "django.template.context_processors.static",
-                "django.template.context_processors.tz",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-
-FIXTURE_DIRS = (str(APPS_DIR / "fixtures"),)
+# No templates for pure API
+# FIXTURE_DIRS = (str(APPS_DIR / "fixtures"),)
 
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
@@ -223,7 +196,6 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
 {%- endif %}
 
-{%- if cookiecutter.use_drf == "y" %}
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -247,7 +219,6 @@ SPECTACULAR_SETTINGS = {
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "SCHEMA_PATH_PREFIX": "/api/",
 }
-{%- endif %}
 {%- if cookiecutter.use_channels == "y" %}
 ASGI_APPLICATION = "config.asgi.application"
 
@@ -262,14 +233,4 @@ CHANNEL_LAYERS = {
 {%- endif %}
 {%- if cookiecutter.monitoring == "Prometheus" or cookiecutter.monitoring == "Grafana" %}
 PROMETHEUS_EXPORT_MIGRATIONS = True
-{%- endif %}
-{%- if cookiecutter.frontend_pipeline == 'Webpack' %}
-WEBPACK_LOADER = {
-    "DEFAULT": {
-        "CACHE": not DEBUG,
-        "STATS_FILE": BASE_DIR / "webpack-stats.json",
-        "POLL_INTERVAL": 0.1,
-        "IGNORE": [r".+\.hot-update.js", r".+\.map"],
-    },
-}
 {%- endif %}

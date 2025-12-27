@@ -30,12 +30,6 @@ def remove_open_source_files():
         Path(file_name).unlink()
 
 
-def remove_gplv3_files():
-    file_names = ["COPYING"]
-    for file_name in file_names:
-        Path(file_name).unlink()
-
-
 def remove_custom_user_manager_files():
     users_path = Path("{{cookiecutter.project_slug}}", "apps", "users")
     (users_path / "managers.py").unlink()
@@ -53,7 +47,6 @@ def remove_pycharm_files():
 
 
 def remove_docker_files():
-    shutil.rmtree(".devcontainer")
     shutil.rmtree("compose")
 
     file_names = [
@@ -76,124 +69,6 @@ def remove_nginx_docker_files():
 
 def remove_utility_files():
     shutil.rmtree("utility")
-
-
-def remove_heroku_files():
-    file_names = ["Procfile"]
-    for file_name in file_names:
-        if file_name == "requirements.txt" and "{{ cookiecutter.ci_tool }}".lower() == "travis":
-            # Don't remove the file if we are using Travis CI but not using Heroku
-            continue
-        Path(file_name).unlink()
-    shutil.rmtree("bin")
-
-
-def remove_sass_files():
-    shutil.rmtree(Path("{{cookiecutter.project_slug}}", "static", "sass"))
-
-
-def remove_gulp_files():
-    file_names = ["gulpfile.mjs"]
-    for file_name in file_names:
-        Path(file_name).unlink()
-
-
-def remove_webpack_files():
-    shutil.rmtree("webpack")
-    remove_vendors_js()
-
-
-def remove_vendors_js():
-    vendors_js_path = Path("{{ cookiecutter.project_slug }}", "static", "js", "vendors.js")
-    if vendors_js_path.exists():
-        vendors_js_path.unlink()
-
-
-def remove_project_css():
-    project_css_path = Path("{{ cookiecutter.project_slug }}", "static", "css", "project.css")
-    if project_css_path.exists():
-        project_css_path.unlink()
-
-
-def remove_packagejson_file():
-    file_names = ["package.json"]
-    for file_name in file_names:
-        Path(file_name).unlink()
-
-
-def update_package_json(remove_dev_deps=None, remove_keys=None, scripts=None):
-    remove_dev_deps = remove_dev_deps or []
-    remove_keys = remove_keys or []
-    scripts = scripts or {}
-    package_json = Path("package.json")
-    content = json.loads(package_json.read_text())
-    for package_name in remove_dev_deps:
-        content["devDependencies"].pop(package_name)
-    for key in remove_keys:
-        content.pop(key)
-    content["scripts"].update(scripts)
-    updated_content = json.dumps(content, ensure_ascii=False, indent=2) + "\n"
-    package_json.write_text(updated_content)
-
-
-def handle_js_runner(choice, use_docker, use_async):
-    if choice == "Gulp":
-        update_package_json(
-            remove_dev_deps=[
-                "@babel/core",
-                "@babel/preset-env",
-                "babel-loader",
-                "concurrently",
-                "css-loader",
-                "mini-css-extract-plugin",
-                "postcss-loader",
-                "postcss-preset-env",
-                "sass-loader",
-                "webpack",
-                "webpack-bundle-tracker",
-                "webpack-cli",
-                "webpack-dev-server",
-                "webpack-merge",
-            ],
-            remove_keys=["babel"],
-            scripts={
-                "dev": "gulp",
-                "build": "gulp build",
-            },
-        )
-        remove_webpack_files()
-    elif choice == "Webpack":
-        scripts = {
-            "dev": "webpack serve --config webpack/dev.config.js",
-            "build": "webpack --config webpack/prod.config.js",
-        }
-        remove_dev_deps = [
-            "browser-sync",
-            "cssnano",
-            "gulp",
-            "gulp-concat",
-            "gulp-imagemin",
-            "gulp-plumber",
-            "gulp-postcss",
-            "gulp-rename",
-            "gulp-sass",
-            "gulp-uglify-es",
-        ]
-        if not use_docker:
-            dev_django_cmd = (
-                "uvicorn config.asgi:application --reload" if use_async else "python manage.py runserver_plus"
-            )
-            scripts.update(
-                {
-                    "dev": "concurrently npm:dev:*",
-                    "dev:webpack": "webpack serve --config webpack/dev.config.js",
-                    "dev:django": dev_django_cmd,
-                },
-            )
-        else:
-            remove_dev_deps.append("concurrently")
-        update_package_json(remove_dev_deps=remove_dev_deps, scripts=scripts)
-        remove_gulp_files()
 
 
 def remove_prettier_pre_commit():
@@ -224,7 +99,8 @@ def remove_celery_files():
         Path("{{ cookiecutter.project_slug }}", "apps", "users", "tests", "test_tasks.py"),
     ]
     for file_path in file_paths:
-        file_path.unlink()
+        if file_path.exists():
+            file_path.unlink()
 
 
 def remove_async_files():
@@ -233,7 +109,37 @@ def remove_async_files():
         Path("config", "websocket.py"),
     ]
     for file_path in file_paths:
-        file_path.unlink()
+        if file_path.exists():
+            file_path.unlink()
+
+
+def remove_docs_files():
+    """Remove documentation folder for pure API template."""
+    docs_dir = Path("docs")
+    if docs_dir.exists():
+        shutil.rmtree(docs_dir)
+    # Remove docs-related files
+    docs_files = [
+        Path("docker-compose.docs.yml"),
+        Path(".readthedocs.yml"),
+    ]
+    for doc_file in docs_files:
+        if doc_file.exists():
+            doc_file.unlink()
+
+
+def remove_locale_files():
+    """Remove locale folder for pure API template."""
+    locale_dir = Path("locale")
+    if locale_dir.exists():
+        shutil.rmtree(locale_dir)
+
+
+def remove_bin_folder():
+    """Remove bin folder."""
+    bin_dir = Path("bin")
+    if bin_dir.exists():
+        shutil.rmtree(bin_dir)
 
 
 def remove_dottravisyml_file():
@@ -258,7 +164,8 @@ def remove_channel_files():
         Path("{{ cookiecutter.project_slug }}", "apps", "users", "consumers.py"),
     ]
     for file_path in file_paths:
-        file_path.unlink()
+        if file_path.exists():
+            file_path.unlink()
 
 
 def generate_random_string(length, using_digits=False, using_ascii_letters=False, using_punctuation=False):  # noqa: FBT002
@@ -372,34 +279,33 @@ def append_to_gitignore_file(ignored_line):
 
 
 def set_flags_in_envs(postgres_user, celery_flower_user, debug=False):  # noqa: FBT002
-    local_django_envs_path = Path(".envs", ".local", ".django")
-    production_django_envs_path = Path(".envs", ".production", ".django")
-    local_postgres_envs_path = Path(".envs", ".local", ".postgres")
-    production_postgres_envs_path = Path(".envs", ".production", ".postgres")
-
-    set_django_secret_key(production_django_envs_path)
-    set_django_admin_url(production_django_envs_path)
-
-    set_postgres_user(local_postgres_envs_path, value=postgres_user)
-    set_postgres_password(local_postgres_envs_path, value=DEBUG_VALUE if debug else None)
-    set_postgres_user(production_postgres_envs_path, value=postgres_user)
-    set_postgres_password(production_postgres_envs_path, value=DEBUG_VALUE if debug else None)
-
-    set_celery_flower_user(local_django_envs_path, value=celery_flower_user)
-    set_celery_flower_password(local_django_envs_path, value=DEBUG_VALUE if debug else None)
-    set_celery_flower_user(production_django_envs_path, value=celery_flower_user)
-    set_celery_flower_password(production_django_envs_path, value=DEBUG_VALUE if debug else None)
+    """Set flags in the single .env file."""
+    env_path = Path(".env")
+    
+    if not env_path.exists():
+        return
+    
+    env_content = env_path.read_text()
+    
+    # Generate secret key for Django
+    django_secret_key = generate_random_string(50, using_digits=True, using_ascii_letters=True)
+    env_content = env_content.replace("your-secret-key-here", django_secret_key)
+    
+    # Set postgres user
+    env_content = env_content.replace("!!!SET POSTGRES_USER!!!", postgres_user)
+    env_content = env_content.replace("POSTGRES_PASSWORD=postgres", f"POSTGRES_PASSWORD={DEBUG_VALUE if debug else generate_random_string(15, using_digits=True, using_ascii_letters=True)}")
+    
+    # Set Celery flower credentials if Celery is enabled
+    if "{{ cookiecutter.use_celery }}" == "y":
+        env_content = env_content.replace("!!!SET CELERY_FLOWER_USER!!!", celery_flower_user)
+        env_content = env_content.replace("CELERY_FLOWER_PASSWORD=password", f"CELERY_FLOWER_PASSWORD={DEBUG_VALUE if debug else generate_random_string(15, using_digits=True, using_ascii_letters=True)}")
+    
+    env_path.write_text(env_content)
 
 
 def set_flags_in_settings_files():
     set_django_secret_key(Path("config", "settings", "local.py"))
     set_django_secret_key(Path("config", "settings", "test.py"))
-
-
-def remove_envs_and_associated_files():
-    shutil.rmtree(".envs")
-    Path("merge_production_dotenvs_in_dotenv.py").unlink()
-    shutil.rmtree("tests")
 
 
 def remove_celery_compose_dirs():
@@ -419,30 +325,7 @@ def remove_drf_starter_files():
     Path("config", "api_router.py").unlink()
     shutil.rmtree(Path("{{cookiecutter.project_slug}}", "apps", "users", "api"))
     shutil.rmtree(Path("{{cookiecutter.project_slug}}", "apps", "users", "tests", "api"))
-
-
-def remove_allauth_files():
-    """Remove all django-allauth related files and configuration."""
-    users_path = Path("{{cookiecutter.project_slug}}", "apps", "users")
     
-    # Remove allauth-specific files
-    files_to_remove = [
-        users_path / "adapters.py",
-        users_path / "forms.py",
-        users_path / "context_processors.py",
-    ]
-    
-    # Remove allauth test files if they exist
-    tests_path = users_path / "tests"
-    test_files_to_remove = [
-        tests_path / "test_forms.py",
-        tests_path / "test_adapters.py",
-    ]
-    
-    for file_path in files_to_remove + test_files_to_remove:
-        if file_path.exists():
-            file_path.unlink()
-
 
 def remove_prometheus_grafana_files():
     """Remove Prometheus and Grafana configuration if not needed."""
@@ -476,8 +359,6 @@ def main():  # noqa: C901, PLR0912, PLR0915
 
     if "{{ cookiecutter.open_source_license }}" == "Not open source":
         remove_open_source_files()
-    if "{{ cookiecutter.open_source_license}}" != "GPLv3":
-        remove_gplv3_files()
 
     if "{{ cookiecutter.username_type }}" == "username":
         remove_custom_user_manager_files()
@@ -495,13 +376,6 @@ def main():  # noqa: C901, PLR0912, PLR0915
     if "{{ cookiecutter.use_docker }}".lower() == "y" and "{{ cookiecutter.cloud_provider}}" != "AWS":
         remove_aws_dockerfile()
 
-    if "{{ cookiecutter.use_docker }}".lower() == "n":
-        if "{{ cookiecutter.keep_local_envs_in_vcs }}".lower() == "y":
-            print(
-                INFO + ".env(s) are only utilized when Docker Compose is enabled so keeping them does not make sense "
-                "given your current setup." + TERMINATOR,
-            )
-        remove_envs_and_associated_files()
     else:
         append_to_gitignore_file(".env")
         append_to_gitignore_file(".envs/*")
@@ -513,6 +387,11 @@ def main():  # noqa: C901, PLR0912, PLR0915
             WARNING + "You chose to not use any cloud providers nor Docker, "
             "media files won't be served in production." + TERMINATOR,
         )
+
+    # Always remove for pure API template
+    remove_docs_files()
+    remove_locale_files()
+    remove_bin_folder()
 
     if "{{ cookiecutter.use_celery }}".lower() == "n":
         remove_celery_files()
@@ -531,9 +410,6 @@ def main():  # noqa: C901, PLR0912, PLR0915
     if "{{ cookiecutter.ci_tool }}" != "Drone":
         remove_dotdrone_file()
 
-    # Always remove allauth files since we're using JWT
-    remove_allauth_files()
-
     if "{{ cookiecutter.use_async }}".lower() == "n":
         remove_async_files()
 
@@ -549,9 +425,8 @@ def main():  # noqa: C901, PLR0912, PLR0915
 
 
 def setup_dependencies():
-    print("Installing python dependencies using uv...")
-
     if "{{ cookiecutter.use_docker }}".lower() == "y":
+        print("Installing python dependencies using uv...")
         # Build a trimmed down Docker image add dependencies with uv
         uv_docker_image_path = Path("compose/local/uv/Dockerfile")
         uv_image_tag = "cookiecutter-django-uv-runner:latest"
@@ -577,23 +452,46 @@ def setup_dependencies():
         current_path = Path.cwd().absolute()
         # Use Docker to run the uv command
         uv_cmd = ["docker", "run", "--rm", "-v", f"{current_path}:/app", uv_image_tag, "uv"]
+
+        # Install production dependencies
+        try:
+            subprocess.run([*uv_cmd, "add", "--no-sync", "-r", "requirements/production.txt"], check=True)  # noqa: S603
+        except subprocess.CalledProcessError as e:
+            print(f"Error installing production dependencies: {e}", file=sys.stderr)
+            sys.exit(1)
+
+        # Install local (development) dependencies
+        try:
+            subprocess.run([*uv_cmd, "add", "--no-sync", "--dev", "-r", "requirements/local.txt"], check=True)  # noqa: S603
+        except subprocess.CalledProcessError as e:
+            print(f"Error installing local dependencies: {e}", file=sys.stderr)
+            sys.exit(1)
+
+        uv_image_parent_dir_path = Path("compose/local/uv")
+        if uv_image_parent_dir_path.exists():
+            shutil.rmtree(str(uv_image_parent_dir_path))
     else:
-        # Use uv command directly
-        uv_cmd = ["uv"]
+        print("Installing python dependencies using pip...")
+        # Use pip with virtualenv for non-Docker setup
+        try:
+            # Install production dependencies
+            subprocess.run(  # noqa: S603
+                [sys.executable, "-m", "pip", "install", "-q", "-r", "requirements/production.txt"],
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Error installing production dependencies: {e}", file=sys.stderr)
+            sys.exit(1)
 
-    # Install production dependencies
-    try:
-        subprocess.run([*uv_cmd, "add", "--no-sync", "-r", "requirements/production.txt"], check=True)  # noqa: S603
-    except subprocess.CalledProcessError as e:
-        print(f"Error installing production dependencies: {e}", file=sys.stderr)
-        sys.exit(1)
-
-    # Install local (development) dependencies
-    try:
-        subprocess.run([*uv_cmd, "add", "--no-sync", "--dev", "-r", "requirements/local.txt"], check=True)  # noqa: S603
-    except subprocess.CalledProcessError as e:
-        print(f"Error installing local dependencies: {e}", file=sys.stderr)
-        sys.exit(1)
+        try:
+            # Install local (development) dependencies
+            subprocess.run(  # noqa: S603
+                [sys.executable, "-m", "pip", "install", "-q", "-r", "requirements/local.txt"],
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Error installing local dependencies: {e}", file=sys.stderr)
+            sys.exit(1)
 
     # Remove the requirements directory
     requirements_dir = Path("requirements")
@@ -603,10 +501,6 @@ def setup_dependencies():
         except Exception as e:  # noqa: BLE001
             print(f"Error removing 'requirements' folder: {e}", file=sys.stderr)
             sys.exit(1)
-
-    uv_image_parent_dir_path = Path("compose/local/uv")
-    if uv_image_parent_dir_path.exists():
-        shutil.rmtree(str(uv_image_parent_dir_path))
 
     print("Setup complete!")
 

@@ -11,7 +11,7 @@
     "MIT",
     "BSD",
     "GPLv3",
-    "Apache Software License 2.0",
+    "Apache Software License 2.0"
   ],
   "username_type": ["email", "username"],
   "timezone": "UTC",
@@ -19,7 +19,7 @@
   "editor": ["VS Code", "None", "PyCharm"],
   "use_docker": "n",
   "postgresql_version": ["17", "16", "15", "14"],
-  "cloud_provider": ["AWS", "GCP", "Azure", "DigitalOcean", "None"],
+  "cloud_provider": ["DigitalOcean", "AWS", "GCP", "Azure", "None"],
   "mail_service": [
     "Mailgun",
     "Amazon SES",
@@ -27,11 +27,11 @@
     "Resend",
     "Other SMTP"
   ],
-  "use_async": "n",
+  "use_async": "y",
   "use_celery": "n",
-  "use_mailpit": "n",
+  "use_mailpit": "y",
   "use_s3": "n",
-  "use_channels": ["n", "y"],
+  "use_channels": "n",
   "monitoring": ["None", "Prometheus", "Grafana"],
   "use_whitenoise": "n",
   "ci_tool": ["None", "Travis", "Gitlab", "Github", "Drone"],
